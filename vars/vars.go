@@ -8,11 +8,13 @@ import (
 )
 
 type EstrucReg struct {
-	Id         int64  `json:"id"`
-	IdPersona  int64  `json:"idpersona"`
-	IdArticulo int64  `json:"idarticulo"`
-	Tipo       string `json:"tipo"`
-	Cantidad   int64  `json:"cantidad"` //Modificar
+	Id             int64  `json:"id"`
+	IdPersona      int64  `json:"idpersona"`
+	NombrePersona  string `json:"nombrepersona"`
+	IdArticulo     int64  `json:"idarticulo"`
+	NombreArticulo string `json:"nombrearticulo"`
+	Tipo           string `json:"tipo"`
+	Cantidad       int64  `json:"cantidad"` //Modificar
 }
 
 var _ = godotenv.Load(".env") // Cargar del archivo llamado ".env"

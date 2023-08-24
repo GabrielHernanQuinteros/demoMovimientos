@@ -13,7 +13,33 @@ func CrearRegistroSQL(registro myvars.EstrucReg) error {
 		return err
 	}
 
-	_, err = bd.Exec("INSERT INTO movimientos (idPersona, IdArticulo, tipo, cantidad) VALUES (?, ?, ?, ?)", registro.idPersona, registro.IdArticulo, registro.Tipo, registro.Cantidad) //Modificar
+	//==========================================================================================================
+
+	var auxIdPersona int64
+
+	err = bd.QueryRow("SELECT id FROM personas WHERE nombre = ?", registro.NombrePersona).Scan(&auxIdPersona)
+
+	if err != nil {
+		return err
+	}
+
+	registro.IdPersona = auxIdPersona
+
+	//==========================================================================================================
+
+	var auxIdArticulo int64
+
+	err = bd.QueryRow("SELECT id FROM personas WHERE nombre = ?", registro.NombreArticulo).Scan(&auxIdArticulo)
+
+	if err != nil {
+		return err
+	}
+
+	registro.IdArticulo = auxIdArticulo
+
+	//==========================================================================================================
+
+	_, err = bd.Exec("INSERT INTO movimientos (idPersona, idArticulo, tipo, cantidad) VALUES (?, ?, ?, ?)", registro.IdPersona, registro.IdArticulo, registro.Tipo, registro.Cantidad) //Modificar
 
 	return err
 
