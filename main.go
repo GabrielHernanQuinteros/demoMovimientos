@@ -6,8 +6,8 @@ import (
 	"time"
 
 	mytools "github.com/GabrielHernanQuinteros/demoCommon"
-	myroute "github.com/GabrielHernanQuinteros/demoPersonas/routes" //Modificar
-	myvars "github.com/GabrielHernanQuinteros/demoPersonas/vars"    //Modificar
+	myroute "github.com/GabrielHernanQuinteros/demoMovimientos/routes" //Modificar
+	myvars "github.com/GabrielHernanQuinteros/demoMovimientos/vars"    //Modificar
 	"github.com/gorilla/mux"
 )
 

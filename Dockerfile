@@ -12,8 +12,8 @@ COPY vars ./vars
 COPY routes ./routes
 COPY controller ./controller
 
-RUN go build -o demopersonas
+RUN go build -o demomovimientos
 
-EXPOSE 8001
+EXPOSE 8002
 
-CMD ["./demopersonas"]
+CMD ["./demomovimientos"]

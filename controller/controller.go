@@ -2,7 +2,7 @@ package controller
 
 import (
 	mytools "github.com/GabrielHernanQuinteros/demoCommon"
-	myvars "github.com/GabrielHernanQuinteros/demoPersonas/vars" //Modificar
+	myvars "github.com/GabrielHernanQuinteros/demoMovimientos/vars" //Modificar
 )
 
 func CrearRegistroSQL(registro myvars.EstrucReg) error {
@@ -13,7 +13,7 @@ func CrearRegistroSQL(registro myvars.EstrucReg) error {
 		return err
 	}
 
-	_, err = bd.Exec("INSERT INTO personas (documento, nombre, direccion) VALUES (?, ?, ?)", registro.Documento, registro.Nombre, registro.Direccion) //Modificar
+	_, err = bd.Exec("INSERT INTO movimientos (idPersona, IdArticulo, tipo, cantidad) VALUES (?, ?, ?, ?)", registro.idPersona, registro.IdArticulo, registro.Tipo, registro.Cantidad) //Modificar
 
 	return err
 
@@ -27,7 +27,7 @@ func BorrarRegistroSQL(id int64) error {
 		return err
 	}
 
-	_, err = bd.Exec("DELETE FROM personas WHERE id = ?", id) //Modificar
+	_, err = bd.Exec("DELETE FROM movimientos WHERE id = ?", id) //Modificar
 
 	return err
 }
@@ -40,7 +40,7 @@ func ModificarRegistroSQL(registro myvars.EstrucReg) error {
 		return err
 	}
 
-	_, err = bd.Exec("UPDATE personas SET documento = ?, nombre = ?, direccion = ? WHERE id = ?", registro.Documento, registro.Nombre, registro.Direccion, registro.Id) //Modificar
+	_, err = bd.Exec("UPDATE movimientos SET IdPersona = ?, IdArticulo = ?, Tipo = ?, Cantidad = ? WHERE id = ?", registro.IdPersona, registro.IdArticulo, registro.Tipo, registro.Cantidad, registro.Id) //Modificar
 
 	return err
 }
@@ -57,7 +57,7 @@ func TraerRegistrosSQL() ([]myvars.EstrucReg, error) {
 	}
 
 	// Get rows so we can iterate them
-	rows, err := bd.Query("SELECT * FROM personas") //Modificar
+	rows, err := bd.Query("SELECT * FROM movimientos") //Modificar
 
 	if err != nil {
 		return arrRegistros, err
@@ -68,7 +68,7 @@ func TraerRegistrosSQL() ([]myvars.EstrucReg, error) {
 		// In each step, scan one row
 		var registro myvars.EstrucReg
 
-		err = rows.Scan(&registro.Id, &registro.Documento, &registro.Nombre, &registro.Direccion) //Modificar
+		err = rows.Scan(&registro.Id, &registro.IdPersona, &registro.IdArticulo, &registro.Tipo, &registro.Cantidad) //Modificar
 
 		if err != nil {
 			return arrRegistros, err
@@ -92,9 +92,9 @@ func TraerRegistroPorIdSQL(id int64) (myvars.EstrucReg, error) {
 		return registro, err
 	}
 
-	row := bd.QueryRow("SELECT * FROM personas WHERE id = ?", id) //Modificar
+	row := bd.QueryRow("SELECT * FROM movimientos WHERE id = ?", id) //Modificar
 
-	err = row.Scan(&registro.Id, &registro.Documento, &registro.Nombre, &registro.Direccion) //Modificar
+	err = row.Scan(&registro.Id, &registro.IdPersona, &registro.IdArticulo, &registro.Tipo, &registro.Cantidad) //Modificar
 
 	if err != nil {
 		return registro, err
@@ -115,9 +115,9 @@ func TraerRegistroPorNombreSQL(parNombre string) (myvars.EstrucReg, error) {
 		return registro, err
 	}
 
-	row := bd.QueryRow("SELECT * FROM personas WHERE nombre = ?", parNombre) //Modificar
+	row := bd.QueryRow("SELECT * FROM movimientos WHERE nombre = ?", parNombre) //Modificar
 
-	err = row.Scan(&registro.Id, &registro.Documento, &registro.Nombre, &registro.Direccion) //Modificar
+	err = row.Scan(&registro.Id, &registro.IdPersona, &registro.IdArticulo, &registro.Tipo, &registro.Cantidad) //Modificar
 
 	if err != nil {
 		return registro, err

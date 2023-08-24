@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	mytools "github.com/GabrielHernanQuinteros/demoCommon"
-	myctrllr "github.com/GabrielHernanQuinteros/demoPersonas/controller" //Modificar
-	myvars "github.com/GabrielHernanQuinteros/demoPersonas/vars"         //Modificar
+	myctrllr "github.com/GabrielHernanQuinteros/demoMovimientos/controller" //Modificar
+	myvars "github.com/GabrielHernanQuinteros/demoMovimientos/vars"         //Modificar
 	"github.com/gorilla/mux"
 )
 
