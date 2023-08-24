@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"fmt"
+
 	mytools "github.com/GabrielHernanQuinteros/demoCommon"
 	myvars "github.com/GabrielHernanQuinteros/demoMovimientos/vars" //Modificar
 )
@@ -15,27 +17,53 @@ func CrearRegistroSQL(registro myvars.EstrucReg) error {
 
 	//==========================================================================================================
 
+	bd2, err := mytools.ConectarDB(myvars.ConnectionStringPersonas)
+
 	var auxIdPersona int64
 
-	err = bd.QueryRow("SELECT id FROM personas WHERE nombre = ?", registro.NombrePersona).Scan(&auxIdPersona)
+	err = bd2.QueryRow("SELECT id FROM personas WHERE nombre = ?", registro.NombrePersona).Scan(&auxIdPersona)
 
 	if err != nil {
-		return err
+		return fmt.Errorf("Error: Persona no encontrada")
 	}
 
 	registro.IdPersona = auxIdPersona
 
 	//==========================================================================================================
 
+	bd3, err := mytools.ConectarDB(myvars.ConnectionStringArticulos)
+
 	var auxIdArticulo int64
 
-	err = bd.QueryRow("SELECT id FROM personas WHERE nombre = ?", registro.NombreArticulo).Scan(&auxIdArticulo)
+	err = bd3.QueryRow("SELECT id FROM articulos WHERE nombre = ?", registro.NombreArticulo).Scan(&auxIdArticulo)
+
+	if err != nil {
+		return fmt.Errorf("Error: Artículo no encontrado")
+	}
+
+	registro.IdArticulo = auxIdArticulo
+
+	//UPDATE DEL STOCK EN EL ARTICULO
+
+	var auxCantidad int64
+
+	if registro.Tipo == "compra" {
+		auxCantidad = registro.Cantidad
+	} else {
+
+		if registro.Tipo == "venta" {
+			auxCantidad = registro.Cantidad * -1
+		} else {
+			return fmt.Errorf("Error: El tipo debe ser 'compra' ó 'venta'")
+		}
+
+	}
+
+	_, err = bd3.Exec("UPDATE articulos SET stock = stock + ? WHERE id = ?", auxCantidad, auxIdArticulo)
 
 	if err != nil {
 		return err
 	}
-
-	registro.IdArticulo = auxIdArticulo
 
 	//==========================================================================================================
 
@@ -131,25 +159,60 @@ func TraerRegistroPorIdSQL(id int64) (myvars.EstrucReg, error) {
 
 }
 
-func TraerRegistroPorNombreSQL(parNombre string) (myvars.EstrucReg, error) {
+func TraerRegistroPorNombreSQL(parNombre string) ([]myvars.EstrucReg, error) {
 
-	var registro myvars.EstrucReg
+	arrRegistros := []myvars.EstrucReg{}
+
+	var auxNombreArticulo string
+
+	//==========================================================================================================
+
+	bd2, err := mytools.ConectarDB(myvars.ConnectionStringPersonas)
+
+	var auxIdPersona int64
+
+	err = bd2.QueryRow("SELECT id FROM personas WHERE nombre = ?", parNombre).Scan(&auxIdPersona)
+
+	if err != nil {
+		return arrRegistros, fmt.Errorf("Error: Persona no encontrada")
+	}
+
+	//==========================================================================================================
 
 	bd, err := mytools.ConectarDB(myvars.ConnectionString)
 
-	if err != nil {
-		return registro, err
-	}
-
-	row := bd.QueryRow("SELECT * FROM movimientos WHERE nombre = ?", parNombre) //Modificar
-
-	err = row.Scan(&registro.Id, &registro.IdPersona, &registro.IdArticulo, &registro.Tipo, &registro.Cantidad) //Modificar
+	// Get rows so we can iterate them
+	rows, err := bd.Query("SELECT * FROM movimientos WHERE idpersona = ?", auxIdPersona) //Modificar
 
 	if err != nil {
-		return registro, err
+		return arrRegistros, err
 	}
 
-	// Success!
-	return registro, nil
+	bd3, err := mytools.ConectarDB(myvars.ConnectionStringArticulos)
+
+	// Iterate rows...
+	for rows.Next() {
+		// In each step, scan one row
+		var registro myvars.EstrucReg
+
+		err = rows.Scan(&registro.Id, &registro.IdPersona, &registro.IdArticulo, &registro.Tipo, &registro.Cantidad) //Modificar
+
+		if err != nil {
+			return arrRegistros, err
+		}
+
+		err = bd3.QueryRow("SELECT nombre FROM articulos WHERE id = ?", registro.IdArticulo).Scan(&auxNombreArticulo)
+
+		if err != nil {
+			registro.NombreArticulo = "Error: Articulo no encontrada"
+		} else {
+			registro.NombreArticulo = auxNombreArticulo
+		}
+
+		// and append it to the array
+		arrRegistros = append(arrRegistros, registro)
+	}
+
+	return arrRegistros, nil
 
 }

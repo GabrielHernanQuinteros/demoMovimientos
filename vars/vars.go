@@ -27,6 +27,24 @@ var (
 		os.Getenv("db_name"))
 )
 
+var (
+	ConnectionStringPersonas = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s",
+		os.Getenv("user"),
+		os.Getenv("pass"),
+		os.Getenv("host"),
+		os.Getenv("port"),
+		"personas")
+)
+
+var (
+	ConnectionStringArticulos = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s",
+		os.Getenv("user"),
+		os.Getenv("pass"),
+		os.Getenv("host"),
+		os.Getenv("port"),
+		"articulos")
+)
+
 const AllowedCORSDomain = "http://localhost"
 
 const Port = ":8002" //Modificar
