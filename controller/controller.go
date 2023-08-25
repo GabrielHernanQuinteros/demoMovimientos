@@ -1,7 +1,10 @@
 package controller
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 
 	mytools "github.com/GabrielHernanQuinteros/demoCommon"
 	myvars "github.com/GabrielHernanQuinteros/demoMovimientos/vars" //Modificar
@@ -17,17 +20,30 @@ func CrearRegistroSQL(registro myvars.EstrucReg) error {
 
 	//==========================================================================================================
 
-	bd2, err := mytools.ConectarDB(myvars.ConnectionStringPersonas)
-
-	var auxIdPersona int64
-
-	err = bd2.QueryRow("SELECT id FROM personas WHERE nombre = ?", registro.NombrePersona).Scan(&auxIdPersona)
+	auxPeticion := "http://localhost:8001/personasPorNombre/" + registro.NombrePersona
+	response, err := http.Get(auxPeticion)
 
 	if err != nil {
+		return fmt.Errorf("Error: API Personas")
+	}
+
+	responseData, err := ioutil.ReadAll(response.Body)
+
+	if string(responseData) == "sql: no rows in result set" {
 		return fmt.Errorf("Error: Persona no encontrada")
 	}
 
-	registro.IdPersona = auxIdPersona
+	var data map[string]interface{}
+
+	// Deserializar la cadena JSON en la estructura
+	err = json.Unmarshal([]byte(responseData), &data)
+
+	if err != nil {
+		return err
+	}
+
+	// Acceder a la clave "id" en la estructura
+	registro.IdPersona, err = mytools.InterfaceToInt64(data["id"])
 
 	//==========================================================================================================
 
