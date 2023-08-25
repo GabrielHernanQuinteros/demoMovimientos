@@ -45,6 +45,10 @@ func CrearRegistroSQL(registro myvars.EstrucReg) error {
 	// Acceder a la clave "id" en la estructura
 	registro.IdPersona, err = mytools.InterfaceToInt64(data["id"])
 
+	if err != nil {
+		return err
+	}
+
 	//==========================================================================================================
 
 	bd3, err := mytools.ConectarDB(myvars.ConnectionStringArticulos)
