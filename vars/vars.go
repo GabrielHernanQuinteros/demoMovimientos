@@ -47,9 +47,9 @@ var (
 
 const AllowedCORSDomain = "http://localhost"
 
-const Port = ":8002" //Modificar
+var Port = ":" + os.Getenv("puerto_propio")
 
 const NombreRuta = "movimientos" //Modificar
 
-const IpApiArticulos = "172.20.0.3" //Modificar
-const IpApiPersonas = "172.20.0.4"  //Modificar
+var IpApiArticulos = os.Getenv("ip_api_articulos")
+var IpApiPersonas = os.Getenv("ip_api_personas")
