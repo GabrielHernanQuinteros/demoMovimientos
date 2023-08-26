@@ -50,3 +50,6 @@ const AllowedCORSDomain = "http://localhost"
 const Port = ":8002" //Modificar
 
 const NombreRuta = "movimientos" //Modificar
+
+const IpApiArticulos = "172.20.0.3" //Modificar
+const IpApiPersonas = "172.20.0.4"  //Modificar
