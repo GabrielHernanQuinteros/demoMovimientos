@@ -13,7 +13,7 @@ import (
 
 func main() {
 
-	time.Sleep(15 * time.Second)
+	time.Sleep(3 * time.Second)
 
 	//Se conecta a la BD para hacer un ping y probar la existencia y conectividad
 	auxBaseDatos, err := mytools.ConectarDB(myvars.ConnectionString)
