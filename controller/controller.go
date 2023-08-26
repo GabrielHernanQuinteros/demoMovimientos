@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 
 	mytools "github.com/GabrielHernanQuinteros/demoCommon"
 	myvars "github.com/GabrielHernanQuinteros/demoMovimientos/vars" //Modificar
@@ -21,6 +22,7 @@ func CrearRegistroSQL(registro myvars.EstrucReg) error {
 	//==========================================================================================================
 
 	auxPeticion := "http://localhost:8001/personasPorNombre/" + registro.NombrePersona
+
 	response, err := http.Get(auxPeticion)
 
 	if err != nil {
@@ -29,7 +31,7 @@ func CrearRegistroSQL(registro myvars.EstrucReg) error {
 
 	responseData, err := ioutil.ReadAll(response.Body)
 
-	if string(responseData) == "sql: no rows in result set" {
+	if strings.Contains(string(responseData), "sql: no rows in result set") {
 		return fmt.Errorf("Error: Persona no encontrada")
 	}
 
@@ -42,7 +44,7 @@ func CrearRegistroSQL(registro myvars.EstrucReg) error {
 		return err
 	}
 
-	// Acceder a la clave "id" en la estructura
+	// Acceder a la clave "id" en la estructura, cambiando el TIPO
 	registro.IdPersona, err = mytools.InterfaceToInt64(data["id"])
 
 	if err != nil {
@@ -51,19 +53,43 @@ func CrearRegistroSQL(registro myvars.EstrucReg) error {
 
 	//==========================================================================================================
 
-	bd3, err := mytools.ConectarDB(myvars.ConnectionStringArticulos)
+	auxPeticion = "http://localhost:8000/articulosPorNombre/" + registro.NombreArticulo
 
-	var auxIdArticulo int64
-
-	err = bd3.QueryRow("SELECT id FROM articulos WHERE nombre = ?", registro.NombreArticulo).Scan(&auxIdArticulo)
+	response, err = http.Get(auxPeticion)
 
 	if err != nil {
+		return fmt.Errorf("Error: API Articulos")
+	}
+
+	responseData, err = ioutil.ReadAll(response.Body)
+
+	if strings.Contains(string(responseData), "sql: no rows in result set") {
 		return fmt.Errorf("Error: Artículo no encontrado")
 	}
 
-	registro.IdArticulo = auxIdArticulo
+	//var data map[string]interface{}
 
-	//UPDATE DEL STOCK EN EL ARTICULO
+	// Deserializar la cadena JSON en la estructura
+	err = json.Unmarshal([]byte(responseData), &data)
+
+	if err != nil {
+		return err
+	}
+
+	// Acceder a la clave "id" en la estructura, cambiando el TIPO
+	registro.IdArticulo, err = mytools.InterfaceToInt64(data["id"])
+
+	if err != nil {
+		return err
+	}
+
+	// ************   UPDATE DEL STOCK EN EL ARTICULO   **************
+
+	bd3, err := mytools.ConectarDB(myvars.ConnectionStringArticulos)
+
+	if err != nil {
+		return err
+	}
 
 	var auxCantidad int64
 
@@ -79,7 +105,7 @@ func CrearRegistroSQL(registro myvars.EstrucReg) error {
 
 	}
 
-	_, err = bd3.Exec("UPDATE articulos SET stock = stock + ? WHERE id = ?", auxCantidad, auxIdArticulo)
+	_, err = bd3.Exec("UPDATE articulos SET stock = stock + ? WHERE id = ?", auxCantidad, registro.IdArticulo)
 
 	if err != nil {
 		return err
