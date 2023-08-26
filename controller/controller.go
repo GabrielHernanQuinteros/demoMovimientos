@@ -21,7 +21,7 @@ func CrearRegistroSQL(registro myvars.EstrucReg) error {
 
 	//==========================================================================================================
 
-	auxPeticion := "http://" + IpApiPersonas + ":8001/personasPorNombre/" + registro.NombrePersona
+	auxPeticion := "http://" + myvars.IpApiPersonas + ":8001/personasPorNombre/" + registro.NombrePersona
 
 	response, err := http.Get(auxPeticion)
 
@@ -53,7 +53,7 @@ func CrearRegistroSQL(registro myvars.EstrucReg) error {
 
 	//==========================================================================================================
 
-	auxPeticion = "http://" + IpApiArticulos + ":8000/articulosPorNombre/" + registro.NombreArticulo
+	auxPeticion = "http://" + myvars.IpApiArticulos + ":8000/articulosPorNombre/" + registro.NombreArticulo
 
 	response, err = http.Get(auxPeticion)
 
